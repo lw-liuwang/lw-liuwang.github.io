@@ -1,0 +1,44 @@
+---
+import { getCollection, render } from 'astro:content';
+import { ArrowLeft, ArrowUpRight } from '@lucide/astro';
+import Layout from '../layouts/Layout.astro';
+import Home from '../components/Home.astro';
+import Contributions from '../components/Contributions.astro';
+import Writing from '../components/Writing.astro';
+import { pathFor, date, github, statusLabel } from '../lib/site';
+
+export async function getStaticPaths() {
+  const cases = await getCollection('cases', ({ data }) => !data.draft);
+  const posts = await getCollection('writing', ({ data }) => !data.draft);
+  const routes = [];
+  for (const page of ['', 'contributions', 'writing']) {
+    routes.push({ params: { route: page || undefined }, props: { page, entry: null } });
+  }
+  for (const entry of [...cases, ...posts]) {
+    const page = `${entry.collection === 'cases' ? 'contributions' : 'writing'}/${entry.data.slug}`;
+    routes.push({ params: { route: page }, props: { page, entry } });
+  }
+  return routes;
+}
+const { page, entry } = Astro.props;
+const titles: Record<string, string> = {
+  '': 'Open-source work & engineering notes',
+  contributions: 'Contributions',
+  writing: 'Writing & learning',
+};
+const rendered = entry ? await render(entry) : null;
+const Content = rendered?.Content;
+const headings = rendered?.headings ?? [];
+const caseEntry = entry?.collection === 'cases' ? entry : null;
+const pr = caseEntry ? github.prs.find((pr) => pr.repository === caseEntry.data.repository && pr.number === caseEntry.data.pr) : null;
+---
+<Layout page={page} title={entry?.data.title ?? titles[page]} description={entry?.data.description}>
+  {page === '' && <Home />}
+  {page === 'contributions' && <Contributions />}
+  {page === 'writing' && <Writing />}
+  {entry && Content && <>
+    <a class="back-link" href={pathFor(caseEntry ? 'contributions' : 'writing')}><ArrowLeft size={15} />{caseEntry ? 'All contributions' : 'All writing'}</a>
+    <header class="article-heading"><p class="eyebrow">{caseEntry ? 'CONTRIBUTION CASE STUDY' : 'FIELD NOTES'}</p><h1>{entry.data.title}</h1><p class="article-description">{entry.data.description}</p><div class="article-meta"><time datetime={entry.data.date.toISOString()}>{date(entry.data.date)}</time>{pr && <><span class={`status ${pr.status}`}>{statusLabel(pr.status)}</span><a href={pr.url}>{pr.repository} #{pr.number}<ArrowUpRight size={14} /></a></>}</div><div class="tag-list">{entry.data.tags.map((tag) => <span>{tag}</span>)}</div></header>
+    <div class="article-layout"><article class="prose"><Content /></article><aside class="article-sidebar"><p class="eyebrow">ON THIS PAGE</p><nav aria-label="Table of contents">{headings.filter((heading) => heading.depth === 2).map((heading) => <a href={`#${heading.slug}`}>{heading.text}</a>)}</nav>{pr && <a class="text-link" href={pr.url}>Original pull request<ArrowUpRight size={15} /></a>}</aside></div>
+  </>}
+</Layout>

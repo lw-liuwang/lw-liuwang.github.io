@@ -1,0 +1,56 @@
+{
+  "username": "lw-liuwang",
+  "updatedAt": "2026-10-23T05:41:03.828Z",
+  "prs": [
+    {
+      "repository": "googlecolab/google-colab-cli",
+      "number": 181,
+      "title": "fix: make SSH command launch and cleanup portable to Windows",
+      "url": "https://github.com/googlecolab/google-colab-cli/pull/181",
+      "status": "merged",
+      "createdAt": "2026-10-20T07:09:06Z",
+      "updatedAt": "2026-10-22T01:03:20Z",
+      "mergedAt": "2026-10-22T01:03:19Z"
+    },
+    {
+      "repository": "googlecolab/google-colab-cli",
+      "number": 172,
+      "title": "fix: configure allocation timeouts and recover transient failures",
+      "url": "https://github.com/googlecolab/google-colab-cli/pull/172",
+      "status": "merged",
+      "createdAt": "2026-10-14T11:07:45Z",
+      "updatedAt": "2026-10-14T18:18:54Z",
+      "mergedAt": "2026-10-14T18:18:54Z"
+    },
+    {
+      "repository": "vllm-project/vllm",
+      "number": 52243,
+      "title": "[Kernel] Fix vllm_c fused_add_rms_norm to match native IR rounding semantics",
+      "url": "https://github.com/vllm-project/vllm/pull/52243",
+      "status": "open",
+      "createdAt": "2026-08-14T01:57:38Z",
+      "updatedAt": "2026-10-21T09:34:40Z",
+      "mergedAt": null
+    },
+    {
+      "repository": "sgl-project/sglang-jax",
+      "number": 1806,
+      "title": "fix: preserve compilation cache hits after directory relocation",
+      "url": "https://github.com/sgl-project/sglang-jax/pull/1806",
+      "status": "open",
+      "createdAt": "2026-10-19T11:25:40Z",
+      "updatedAt": "2026-10-19T11:26:42Z",
+      "mergedAt": null
+    },
+    {
+      "repository": "D-Robotics/openpi_runtime",
+      "number": 5,
+      "title": "add s600 infer pi0 pipline",
+      "url": "https://github.com/D-Robotics/openpi_runtime/pull/5",
+      "status": "merged",
+      "createdAt": "2026-01-29T08:37:33Z",
+      "updatedAt": "2026-02-04T03:35:32Z",
+      "mergedAt": "2026-02-04T03:35:31Z"
+    }
+  ]
+}

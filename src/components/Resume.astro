@@ -1,0 +1,27 @@
+---
+import { getEntry, render } from 'astro:content';
+const entry = await getEntry('resume', 'en');
+const published = entry?.data.published;
+const result = published && entry ? await render(entry) : null;
+const Content = result?.Content;
+const monthFormat = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', timeZone: 'UTC' });
+const month = (value: string) => monthFormat.format(new Date(`${value}-01T00:00:00Z`));
+---
+<div class="profile-resume">
+  {Content ?
+    <article class="resume-document" aria-label="Experience and awards">
+      <div class="work-history">
+        {entry?.data.experiences.map((experience) => <div class="work-entry">
+          <img class="company-logo" src={experience.logo} alt={experience.company} width="112" height="40" />
+          <div class="work-description"><h2>{experience.company}</h2><p>{experience.role}</p></div>
+          <p class="work-dates"><time datetime={experience.start}>{month(experience.start)}</time><span aria-hidden="true"> - </span><time datetime={experience.end}>{month(experience.end)}</time></p>
+        </div>)}
+      </div>
+      {entry && entry.data.awards.length > 0 && <div class="resume-awards">
+        <h2>Awards</h2>
+        <ul>{entry.data.awards.map((award) => <li>{`${award.competition} -- ${award.prize}`}</li>)}</ul>
+      </div>}
+      <div class="prose"><Content /></div>
+    </article>
+  : <p class="quiet-copy">Résumé coming soon.</p>}
+</div>

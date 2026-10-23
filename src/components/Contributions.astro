@@ -1,0 +1,59 @@
+---
+import { getCollection } from 'astro:content';
+import { Search, ArrowUpRight, SlidersHorizontal } from '@lucide/astro';
+import ProjectIdentity from './ProjectIdentity.astro';
+import { getProject } from '../data/projects';
+import { github, statusLabel, pathFor, date } from '../lib/site';
+const cases = await getCollection('cases', ({ data }) => !data.draft);
+const repositories = [...new Set(github.prs.map((pr) => pr.repository))].sort();
+---
+<div class="page-heading"><h1>Contributions</h1></div>
+<div class="filter-bar">
+  <label class="search-field"><Search size={17} /><span class="sr-only">Search contributions</span><input id="pr-search" type="search" placeholder="Search title, project, or PR…" /></label>
+  <label class="select-field"><SlidersHorizontal size={16} /><span class="sr-only">Project</span><select id="pr-project"><option value="">All projects</option>{repositories.map((repo) => <option value={repo}>{getProject(repo).name}</option>)}</select></label>
+  <label class="select-field"><span class="sr-only">PR status</span><select id="pr-status"><option value="">All statuses</option>{['merged', 'open', 'draft', 'closed'].map((status) => <option value={status}>{statusLabel(status)}</option>)}</select></label>
+</div>
+<div class="results-meta"><span>Updated {date(github.updatedAt)}</span></div>
+<div class="contribution-list">
+  {github.prs.map((pr) => {
+    const entry = cases.find((entry) => entry.data.repository === pr.repository && entry.data.pr === pr.number);
+    const project = getProject(pr.repository);
+    return <article class="pr-row" data-pr data-search={`${pr.repository} ${project.name} ${project.organization} ${pr.title} ${entry?.data.title ?? ''} ${pr.number}`.toLowerCase()} data-project={pr.repository} data-status={pr.status}>
+      <div class="pr-main">
+        <div class="pr-header"><ProjectIdentity repository={pr.repository} heading="h2" /><span class={`status ${pr.status}`}>{statusLabel(pr.status)}</span></div>
+        <h3 class="pr-title"><a href={entry ? pathFor(`contributions/${entry.data.slug}`) : pr.url}>{entry?.data.title ?? pr.title}<ArrowUpRight size={16} /></a></h3>
+        {entry && <p class="pr-description">{entry.data.description}</p>}
+        <div class="pr-subline"><a href={pr.url}>#{pr.number}</a><time datetime={pr.createdAt}>{date(pr.createdAt)}</time>{entry && <a class="case-study-link" href={pathFor(`contributions/${entry.data.slug}`)}>Read case study<ArrowUpRight size={13} /></a>}</div>
+      </div>
+    </article>;
+  })}
+</div>
+<div id="no-results" class="empty-state" hidden><Search size={28} /><h2>No matching contributions</h2><p>Try another search or reset the filters.</p><button id="reset-filters" class="button secondary">Reset filters</button></div>
+<p class="source-note">Status reflects the snapshot date. See the original PRs for the latest discussion.</p>
+<script>
+  const search = document.querySelector<HTMLInputElement>('#pr-search');
+  const project = document.querySelector<HTMLSelectElement>('#pr-project');
+  const status = document.querySelector<HTMLSelectElement>('#pr-status');
+  const empty = document.querySelector<HTMLElement>('#no-results');
+  const rows = Array.from(document.querySelectorAll<HTMLElement>('[data-pr]'));
+  function filter() {
+    const query = search?.value.trim().toLowerCase() ?? '';
+    let hasResults = false;
+    for (const row of rows) {
+      const matches = row.dataset.search?.includes(query) && (!project?.value || row.dataset.project === project.value) && (!status?.value || row.dataset.status === status.value);
+      row.hidden = !matches;
+      if (matches) hasResults = true;
+    }
+    if (empty) empty.hidden = hasResults;
+  }
+  search?.addEventListener('input', filter);
+  project?.addEventListener('change', filter);
+  status?.addEventListener('change', filter);
+  document.querySelector('#reset-filters')?.addEventListener('click', () => {
+    if (search) search.value = '';
+    if (project) project.value = '';
+    if (status) status.value = '';
+    filter();
+    search?.focus();
+  });
+</script>

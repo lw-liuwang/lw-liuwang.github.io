@@ -1,0 +1,25 @@
+---
+import { ArrowUpRight, FolderGit2 } from '@lucide/astro';
+import { getProject } from '../data/projects';
+
+interface Props {
+  repository: string;
+  heading: 'h2' | 'h3';
+}
+const { repository, heading: Heading } = Astro.props;
+const project = getProject(repository);
+const organizationUrl = `https://github.com/${repository.split('/')[0]}`;
+---
+<div class="project-identity">
+  {project.avatar ? (
+    <img class="project-avatar" src={project.avatar} alt="" width="44" height="44" />
+  ) : (
+    <FolderGit2 class="project-avatar" size={44} />
+  )}
+  <div class="project-copy">
+    <a class="project-organization" href={organizationUrl}>{project.organization}</a>
+    <Heading class="project-heading">
+      <a href={`https://github.com/${repository}`}>{project.name}<ArrowUpRight size={17} /></a>
+    </Heading>
+  </div>
+</div>

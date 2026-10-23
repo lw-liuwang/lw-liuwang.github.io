@@ -1,0 +1,57 @@
+---
+import { CodeXml, ArrowUpRight } from '@lucide/astro';
+import { pathFor, date, github } from '../lib/site';
+import '../styles/global.css';
+import '@fontsource-variable/dm-sans';
+
+interface Props {
+  title: string;
+  description?: string;
+  page?: string;
+}
+const { title, description = 'Open-source contributions, engineering notes, and project experience by liu wang.', page = '' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const nav = [
+  ['', 'Overview'],
+  ['contributions', 'Contributions'],
+  ['#projects', 'Projects'],
+  ['writing', 'Writing'],
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#fafbf9" />
+    <title>{title} · liu wang</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`${title} · liu wang`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL('/avatar.png', Astro.site)} />
+    <link rel="icon" href="/avatar.png" type="image/png" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="wordmark" href={pathFor()} aria-label="liu wang home">liu wang</a>
+        <nav aria-label="Main navigation">
+          {nav.map(([path, label]) => <a href={path.startsWith('#') ? `/${path}` : pathFor(path)} aria-current={page === path || (path === 'contributions' && page.startsWith('contributions/')) || (path === 'writing' && page.startsWith('writing/')) ? 'page' : undefined}>{label}</a>)}
+        </nav>
+        <div class="header-actions">
+          <a class="icon-link github-header" href="https://github.com/lw-liuwang" aria-label="GitHub" title="GitHub"><CodeXml size={19} /></a>
+        </div>
+      </div>
+    </header>
+    <main id="main" class="site-main"><slot /></main>
+    <footer class="site-footer">
+      <div><a href={pathFor()}>liu wang</a></div>
+      <a href="https://github.com/lw-liuwang">GitHub <ArrowUpRight size={14} /></a>
+      <small>PR snapshot · {date(github.updatedAt)}</small>
+    </footer>
+  </body>
+</html>

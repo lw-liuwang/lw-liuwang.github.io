@@ -1,0 +1,8 @@
+---
+import { getCollection } from 'astro:content';
+import { BookOpen, ArrowUpRight } from '@lucide/astro';
+import { pathFor, date } from '../lib/site';
+const posts = (await getCollection('writing', ({ data }) => !data.draft)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+<div class="page-heading"><h1>Writing & learning</h1></div>
+{posts.length ? <div class="writing-list">{posts.map((post) => <article class="writing-row"><time>{date(post.data.date)}</time><div><h2><a href={pathFor(`writing/${post.data.slug}`)}>{post.data.title}<ArrowUpRight size={20} /></a></h2><p>{post.data.description}</p><div class="tag-list">{post.data.tags.map((tag) => <span>{tag}</span>)}</div></div></article>)}</div> : <div class="empty-state notebook-empty"><BookOpen size={36} stroke-width={1.3} /><h2>A notebook in progress</h2></div>}

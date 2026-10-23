@@ -1,0 +1,24 @@
+---
+import { ArrowUpRight, FolderGit2 } from '@lucide/astro';
+import type { CollectionEntry } from 'astro:content';
+import { getProject } from '../data/projects';
+import { github, pathFor, statusLabel } from '../lib/site';
+interface Props { entry: CollectionEntry<'cases'>; }
+const { entry } = Astro.props;
+const data = entry.data;
+const project = getProject(data.repository);
+const organizationUrl = `https://github.com/${data.repository.split('/')[0]}`;
+const pr = github.prs.find((pr) => pr.repository === data.repository && pr.number === data.pr);
+---
+<article class="personal-project contribution-entry">
+  {project.avatar ? <img class="personal-project-logo" src={project.avatar} alt="" width="72" height="72" /> : <FolderGit2 class="personal-project-logo" size={72} />}
+  <div class="personal-project-copy">
+    <a class="project-organization" href={organizationUrl}>{project.organization}</a>
+    <h3><a href={`https://github.com/${data.repository}`}>{project.name}<ArrowUpRight size={18} /></a></h3>
+    <div class="contribution-detail">
+      <h4 class="contribution-title"><a href={pathFor(`contributions/${data.slug}`)}>{data.title}<ArrowUpRight size={15} /></a></h4>
+      <a class="contribution-pr" href={pr?.url ?? `https://github.com/${data.repository}/pull/${data.pr}`} aria-label={`${data.repository} PR #${data.pr}`}>#{data.pr}<ArrowUpRight size={13} /></a>
+      {pr && <span class={`status ${pr.status}`}>{statusLabel(pr.status)}</span>}
+    </div>
+  </div>
+</article>
